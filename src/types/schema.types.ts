@@ -7,6 +7,6 @@ export interface IEmployee extends mongoose.Document {
     email:string;
     address:string;
     age:number;
-    contact:number;
+    contact:string;
     image:string;
 }

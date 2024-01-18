@@ -17,6 +17,7 @@ const app = express();
 dotenv.config();
 
 app.use(bodyParser.json());
+app.use(express.static('src/assets'))
 
 app.use(cors({
     origin: "*"

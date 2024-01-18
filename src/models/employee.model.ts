@@ -7,7 +7,7 @@ const EmployeeSchema =  new mongoose.Schema<SchemaTypes.IEmployee>({
     email:{type: String, required: true},
     address:{type: String, required: true},
     age:{type: Number, required: true},
-    contact:{type: Number, required: true},
+    contact:{type: String, required: true},
     image:{type: String, required: true}
 });
 
