@@ -1,50 +1,51 @@
 import express from "express";
-import EmployeeModel from "../models/employee.model";
+import {ICoffee} from "../types/schema.types";
 import CustomResponse from "../dtos/custom.response";
-import {IEmployee} from "../types/schema.types";
-import * as fs from "fs";
+import fs from "fs";
 import path from "path";
+import CoffeeModel from "../models/coffee.model";
 
-export const saveEmployee = async (req: express.Request, res: any) => {
+export const saveCoffee = async (req: express.Request, res: any) => {
 
     try {
 
-        let req_body: IEmployee = JSON.parse(req.body.employee);
+        let req_body: ICoffee = JSON.parse(req.body.coffee);
         let imageData: Express.Multer.File | undefined = req.file;
 
-        let existingEmployee = await EmployeeModel.findOne({email: req_body.email})
+        let existingCoffee = await CoffeeModel.findOne({name: req_body.name})
             .catch(reason => {
                 console.log(reason)
             });
 
-        if (existingEmployee) {
+        if (existingCoffee) {
 
             removeImage(imageData?.filename);
             res.status(401).send(
-                new CustomResponse(401, "Email already exists !")
+                new CustomResponse(401, "Coffee already exists !")
             );
             return;
         }
 
         if (!imageData) {
             res.status(404).send(
-                new CustomResponse(404, "Employee image not found !")
+                new CustomResponse(404, "Coffee image not found !")
             );
             return;
         }
-        const employeeModel = new EmployeeModel({
+
+        const coffeeModel = new CoffeeModel({
             name: req_body.name,
-            email: req_body.email,
-            address: req_body.address,
-            age: req_body.age,
-            contact: req_body.contact,
+            desc: req_body.desc,
+            largeSize: req_body.largeSize,
+            smallSize: req_body.smallSize,
+            qty: req_body.qty,
             image: imageData?.filename
         });
 
-        await employeeModel.save().then(r => {
+        await coffeeModel.save().then(r => {
 
             res.status(200).send(
-                new CustomResponse(200, "Employee saved successfully !")
+                new CustomResponse(200, "Coffee saved successfully !")
             )
         }).catch(e => {
 
@@ -69,7 +70,7 @@ export const getAll = async (req: express.Request, res: any) => {
         let size: number = req_query.size;
         let page: number = req_query.page;*/
 
-        let employees = await EmployeeModel.find()/*.limit(size).skip(size * (page - 1));*/
+        let coffees = await CoffeeModel.find()/*.limit(size).skip(size * (page - 1));*/
 
         /*let documentCount: number = await ArticleModel.countDocuments();
         let pageCount: number = Math.ceil(documentCount / size);*/
@@ -78,7 +79,7 @@ export const getAll = async (req: express.Request, res: any) => {
             new CustomResponse(
                 200,
                 "Access",
-                employees, /*pageCount*/ 2)
+                coffees, /*pageCount*/ 2)
         );
     } catch (error) {
         res.status(100).send("Error")
@@ -86,71 +87,74 @@ export const getAll = async (req: express.Request, res: any) => {
 
 }
 
-export const employeeGetById = async (req: express.Request, res: any) => {
+export const coffeeGetById = async (req: express.Request, res: any) => {
 
     try {
 
         let _id: string = req.params._id;
 
-        let employee: any = await EmployeeModel.findOne({_id: _id});
+        let coffee = await CoffeeModel.findOne({_id: _id})
+            .catch(reason => {
+                console.log(reason)
+            });
 
-        if (!employee) {
+        if (!coffee) {
             res.status(404).send(
-                new CustomResponse(404, "Employee not found !")
-            )
+                new CustomResponse(404, "Coffee not found !")
+            );
             return;
         }
         res.status(200).send(
             new CustomResponse(
                 200,
                 "Access",
-                employee)
+                coffee)
         )
-
 
     } catch (error) {
         res.status(100).send("Error");
     }
 }
 
-export const updateEmployee = async (req: express.Request, res: any) => {
+export const updateCoffee = async (req: express.Request, res: any) => {
 
+    console.log('update')
     try {
 
-        let req_body: IEmployee = JSON.parse(req.body.employee);
+        let req_body: ICoffee = JSON.parse(req.body.coffee);
         let imageData: Express.Multer.File | undefined = req.file;
 
-        let existingEmployee = await EmployeeModel.findOne({_id: req_body._id})
+        console.log(req_body)
+        let existingCoffee = await CoffeeModel.findOne({_id: req_body._id})
             .catch(reason => {
                 console.log(reason)
             });
 
-        if (!existingEmployee) {
+        if (!existingCoffee) {
             res.status(404).send(
-                new CustomResponse(404, "Employee not found !")
+                new CustomResponse(404, "Coffee not found !")
             );
             return;
-
         }
         if (!imageData) {
             res.status(404).send(
-                new CustomResponse(404, "Employee image not found !")
+                new CustomResponse(404, "Coffee image not found !")
             );
             return;
         }
-        removeImage(existingEmployee.image);
+        removeImage(existingCoffee.image);
 
-        await EmployeeModel.findOneAndUpdate({_id: req_body._id}, {
+        await CoffeeModel.findOneAndUpdate({_id: req_body._id}, {
             name: req_body.name,
-            email: req_body.email,
-            address: req_body.address,
-            age: req_body.age,
-            contact: req_body.contact,
+            desc: req_body.desc,
+            largeSize: req_body.largeSize,
+            smallSize: req_body.smallSize,
+            qty: req_body.qty,
             image: imageData?.filename
         })
             .then(r => {
                 res.status(200).send(
-                    new CustomResponse(100, "Employee updated successfully.")
+                    new CustomResponse(100, "Coffee updated successfully.")
                 )
             }).catch(error => {
                 console.log(error)
@@ -164,33 +168,33 @@ export const updateEmployee = async (req: express.Request, res: any) => {
     }
 }
 
-export const updateEmployeeWithoutImage = async (req: express.Request, res: any) => {
+export const updateCoffeeWithoutImage = async (req: express.Request, res: any) => {
 
     try {
 
-        let req_body: IEmployee = req.body;
-
-        let existingEmployee = await EmployeeModel.findOne({_id: req_body._id})
+        let req_body: ICoffee = req.body;
+        console.log(req_body)
+        let existingCoffee = await CoffeeModel.findOne({_id: req_body._id})
             .catch(reason => {
                 console.log(reason)
             });
 
-        if (!existingEmployee) {
+        if (!existingCoffee) {
             res.status(404).send(
-                new CustomResponse(404, "Employee not found !")
+                new CustomResponse(404, "Coffee not found !")
             );
             return;
         }
-        await EmployeeModel.findOneAndUpdate({_id: req_body._id}, {
+        await CoffeeModel.findOneAndUpdate({_id: req_body._id}, {
             name: req_body.name,
-            email: req_body.email,
-            address: req_body.address,
-            age: req_body.age,
-            contact: req_body.contact
+            desc: req_body.desc,
+            largeSize: req_body.largeSize,
+            smallSize: req_body.smallSize,
+            qty: req_body.qty
         })
             .then(r => {
                 res.status(200).send(
-                    new CustomResponse(100, "Employee updated successfully.")
+                    new CustomResponse(100, "Coffee updated successfully.")
                 )
             }).catch(error => {
                 console.log(error)
@@ -203,26 +207,26 @@ export const updateEmployeeWithoutImage = async (req: express.Request, res: any)
     }
 }
 
-export const deleteEmployee = async (req: express.Request, res: any) => {
+export const deleteCoffee = async (req: express.Request, res: any) => {
 
     try {
 
         let _id = req.params._id;
 
-        let employee: any = await EmployeeModel.findOne({_id: _id});
+        let coffee: any = await CoffeeModel.findOne({_id: _id});
 
-        if (!employee) {
+        if (!coffee) {
             res.status(404).send(
-                new CustomResponse(404, "Employee not found !")
+                new CustomResponse(404, "Coffee not found !")
             )
             return;
         }
 
-        await EmployeeModel.deleteOne({_id: _id}).then(r => {
+        await CoffeeModel.deleteOne({_id: _id}).then(r => {
 
-            removeImage(employee.image);
+            removeImage(coffee.image);
             res.status(200).send(
-                new CustomResponse(200, "Employee is deleted successfully.")
+                new CustomResponse(200, "Coffee is deleted successfully.")
             )
         }).catch(e => {
             res.status(100).send(
@@ -232,6 +236,24 @@ export const deleteEmployee = async (req: express.Request, res: any) => {
     } catch (error) {
         res.status(100).send("Error");
     }
+}
+
+export const updateCoffeeQty = async (_id: string, _qty:number) => {
+
+   /* try {
+
+        await CoffeeModel.findOneAndUpdate({_id: req_body._id}, {
+            qty: ,
+        })
+
+        }).catch(e => {
+            res.status(100).send(
+                new CustomResponse(100, "Something went wrong.")
+            )
+        })
+    } catch (error) {
+        res.status(100).send("Error");
+    }*/
 }
 
 const removeImage = (filename: string | undefined) => {

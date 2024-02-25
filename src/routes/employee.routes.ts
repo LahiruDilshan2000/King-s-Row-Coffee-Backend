@@ -14,7 +14,9 @@ router.post('/', Middleware.verifyToken, Middleware.handleImage, EmployeeControl
 
 router.get('/getAll', EmployeeController.getAll);
 
-router.put('/', EmployeeController.updateEmployee);
+router.put('/', Middleware.verifyToken, Middleware.handleImage, EmployeeController.updateEmployee);
+
+router.put('/withoutImage', EmployeeController.updateEmployeeWithoutImage);
 
 router.get('/getById/:_id', EmployeeController.employeeGetById);
 

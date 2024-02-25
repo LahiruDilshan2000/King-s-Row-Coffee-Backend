@@ -1,5 +1,4 @@
 
-
 //import
 import express from "express";
 import mongoose from "mongoose";
@@ -8,6 +7,8 @@ import cors from "cors";
 import dotenv from "dotenv"
 import * as process from "process";
 import EmployeeRouts from "./routes/employee.routes"
+import CoffeeRouts from "./routes/coffee.routes"
+import DessertRouts from "./routes/dessert.routes"
 
 
 
@@ -43,8 +44,8 @@ db.on( 'open', () => {
 //routes
 
 app.use('/employee', EmployeeRouts);
-
-
+app.use('/coffee', CoffeeRouts);
+app.use('/dessert', DessertRouts);
 
 
 
