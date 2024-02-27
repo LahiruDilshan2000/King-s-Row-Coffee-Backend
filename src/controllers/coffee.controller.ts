@@ -21,7 +21,7 @@ export const saveCoffee = async (req: express.Request, res: any) => {
 
             removeImage(imageData?.filename);
             res.status(401).send(
-                new CustomResponse(401, "Coffee already exists !")
+                new CustomResponse(401, "Coffee name already exists !")
             );
             return;
         }
@@ -118,19 +118,34 @@ export const coffeeGetById = async (req: express.Request, res: any) => {
 
 export const updateCoffee = async (req: express.Request, res: any) => {
 
-    console.log('update')
     try {
 
         let req_body: ICoffee = JSON.parse(req.body.coffee);
         let imageData: Express.Multer.File | undefined = req.file;
 
-        console.log(req_body)
+        let duplicateCoffee = await CoffeeModel.findOne({
+            name: req_body.name,
+            _id: {$ne: req_body._id}
+        })
+            .catch(reason => {
+                console.log(reason)
+            });
+
+        if (duplicateCoffee) {
+            removeImage(imageData?.filename);
+            res.status(401).send(
+                new CustomResponse(401, "Coffee name already exists !")
+            );
+            return;
+        }
+
         let existingCoffee = await CoffeeModel.findOne({_id: req_body._id})
             .catch(reason => {
                 console.log(reason)
             });
 
         if (!existingCoffee) {
+            removeImage(imageData?.filename);
             res.status(404).send(
                 new CustomResponse(404, "Coffee not found !")
             );
@@ -173,7 +188,25 @@ export const updateCoffeeWithoutImage = async (req: express.Request, res: any) =
     try {
 
         let req_body: ICoffee = req.body;
-        console.log(req_body)
+
+        let duplicateCoffee = await CoffeeModel.findOne({
+            name: req_body.name,
+            _id: {$ne: req_body._id}
+        })
+            .catch(reason => {
+                console.log(reason)
+            });
+
+
+        if (duplicateCoffee) {
+
+            //removeImage(imageData?.filename);
+            res.status(401).send(
+                new CustomResponse(401, "Coffee name already exists !")
+            );
+            return;
+        }
+
         let existingCoffee = await CoffeeModel.findOne({_id: req_body._id})
             .catch(reason => {
                 console.log(reason)
@@ -238,22 +271,22 @@ export const deleteCoffee = async (req: express.Request, res: any) => {
     }
 }
 
-export const updateCoffeeQty = async (_id: string, _qty:number) => {
+export const updateCoffeeQty = async (_id: string, _qty: number) => {
 
-   /* try {
+    /* try {
 
-        await CoffeeModel.findOneAndUpdate({_id: req_body._id}, {
-            qty: ,
-        })
+         await CoffeeModel.findOneAndUpdate({_id: req_body._id}, {
+             qty: ,
+         })
 
-        }).catch(e => {
-            res.status(100).send(
-                new CustomResponse(100, "Something went wrong.")
-            )
-        })
-    } catch (error) {
-        res.status(100).send("Error");
-    }*/
+         }).catch(e => {
+             res.status(100).send(
+                 new CustomResponse(100, "Something went wrong.")
+             )
+         })
+     } catch (error) {
+         res.status(100).send("Error");
+     }*/
 }
 
 const removeImage = (filename: string | undefined) => {

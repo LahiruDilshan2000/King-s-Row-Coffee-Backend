@@ -1,6 +1,7 @@
 import express from "express";
 import * as Middleware from "../middlewares";
 import * as CoffeeController from "../controllers/coffee.controller";
+import * as EmployeeController from "../controllers/employee.controller";
 
 const router = express.Router();
 /*
@@ -12,10 +13,10 @@ router.get('/getAll', CoffeeController.getAll);
 
 router.put('/', Middleware.verifyToken, Middleware.handleImage, CoffeeController.updateCoffee);
 
-router.put('/withoutImage', CoffeeController.updateCoffeeWithoutImage);
+router.put('/withoutImage', Middleware.verifyToken, CoffeeController.updateCoffeeWithoutImage);
 
 router.get('/getById/:_id', CoffeeController.coffeeGetById);
 
-router.delete('/:_id', CoffeeController.deleteCoffee);
+router.delete('/:_id', Middleware.verifyToken, CoffeeController.deleteCoffee);
 
 export default router;

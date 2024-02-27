@@ -24,6 +24,7 @@ export interface IDessert extends mongoose.Document {
     name:string;
     desc:string;
     size:number;
+    price:number;
     qty:number;
     image:string;
 }

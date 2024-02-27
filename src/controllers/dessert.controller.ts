@@ -4,6 +4,7 @@ import DessertModel from "../models/dessert.model";
 import CustomResponse from "../dtos/custom.response";
 import fs from "fs";
 import path from "path";
+import CoffeeModel from "../models/coffee.model";
 
 export const saveDessert = async (req: express.Request, res: any) => {
 
@@ -12,14 +13,12 @@ export const saveDessert = async (req: express.Request, res: any) => {
         let req_body: IDessert = JSON.parse(req.body.dessert);
         let imageData: Express.Multer.File | undefined = req.file;
 
-
         let existingDessert = await DessertModel.findOne({name: req_body.name})
             .catch(reason => {
                 console.log(reason)
             });
 
         if (existingDessert) {
-
             removeImage(imageData?.filename);
             res.status(401).send(
                 new CustomResponse(401, "Dessert already exists !")
@@ -37,6 +36,7 @@ export const saveDessert = async (req: express.Request, res: any) => {
             name: req_body.name,
             desc: req_body.desc,
             size: req_body.size,
+            price: req_body.price,
             qty: req_body.qty,
             image: imageData?.filename
         });
@@ -123,12 +123,29 @@ export const updateDessert = async (req: express.Request, res: any) => {
         let req_body: IDessert = JSON.parse(req.body.dessert);
         let imageData: Express.Multer.File | undefined = req.file;
 
+        let duplicateDessert = await DessertModel.findOne({
+            name: req_body.name,
+            _id: {$ne: req_body._id}
+        })
+            .catch(reason => {
+                console.log(reason)
+            });
+
+        if (duplicateDessert) {
+            removeImage(imageData?.filename);
+            res.status(401).send(
+                new CustomResponse(401, "Dessert name already exists !")
+            );
+            return;
+        }
+
         let existingDessert = await DessertModel.findOne({_id: req_body._id})
             .catch(reason => {
                 console.log(reason)
             });
 
         if (!existingDessert) {
+            removeImage(imageData?.filename);
             res.status(404).send(
                 new CustomResponse(404, "Dessert not found !")
             );
@@ -147,6 +164,7 @@ export const updateDessert = async (req: express.Request, res: any) => {
             name: req_body.name,
             desc: req_body.desc,
             size: req_body.size,
+            price:req_body.price,
             qty: req_body.qty,
             image: imageData?.filename
         })
@@ -172,6 +190,21 @@ export const updateDessertWithoutImage = async (req: express.Request, res: any) 
 
         let req_body: IDessert = req.body;
 
+        let duplicateDessert = await DessertModel.findOne({
+            name: req_body.name,
+            _id: {$ne: req_body._id}
+        })
+            .catch(reason => {
+                console.log(reason)
+            });
+
+        if (duplicateDessert) {
+            res.status(401).send(
+                new CustomResponse(401, "Dessert name already exists !")
+            );
+            return;
+        }
+
         let existingDessert = await DessertModel.findOne({_id: req_body._id})
             .catch(reason => {
                 console.log(reason)
@@ -187,6 +220,7 @@ export const updateDessertWithoutImage = async (req: express.Request, res: any) 
             name: req_body.name,
             desc: req_body.desc,
             size: req_body.size,
+            price:req_body.price,
             qty: req_body.qty
         })
             .then(r => {

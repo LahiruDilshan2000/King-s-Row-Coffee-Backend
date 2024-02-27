@@ -4,6 +4,7 @@ import CustomResponse from "../dtos/custom.response";
 import {IEmployee} from "../types/schema.types";
 import * as fs from "fs";
 import path from "path";
+import CoffeeModel from "../models/coffee.model";
 
 export const saveEmployee = async (req: express.Request, res: any) => {
 
@@ -120,12 +121,29 @@ export const updateEmployee = async (req: express.Request, res: any) => {
         let req_body: IEmployee = JSON.parse(req.body.employee);
         let imageData: Express.Multer.File | undefined = req.file;
 
+        let duplicateEmployee = await EmployeeModel.findOne({
+            email: req_body.email,
+            _id:{$ne: req_body._id}
+        })
+            .catch(reason => {
+                console.log(reason)
+            });
+
+        if (duplicateEmployee) {
+            removeImage(imageData?.filename);
+            res.status(401).send(
+                new CustomResponse(401, "Employee email already exists !")
+            );
+            return;
+        }
+
         let existingEmployee = await EmployeeModel.findOne({_id: req_body._id})
             .catch(reason => {
                 console.log(reason)
             });
 
         if (!existingEmployee) {
+            removeImage(imageData?.filename);
             res.status(404).send(
                 new CustomResponse(404, "Employee not found !")
             );
@@ -169,6 +187,22 @@ export const updateEmployeeWithoutImage = async (req: express.Request, res: any)
     try {
 
         let req_body: IEmployee = req.body;
+
+        let duplicateEmployee = await EmployeeModel.findOne({
+            email: req_body.email,
+            _id:{$ne: req_body._id}
+        })
+            .catch(reason => {
+                console.log(reason)
+            });
+
+        if (duplicateEmployee) {
+
+            res.status(401).send(
+                new CustomResponse(401, "Employee email already exists !")
+            );
+            return;
+        }
 
         let existingEmployee = await EmployeeModel.findOne({_id: req_body._id})
             .catch(reason => {

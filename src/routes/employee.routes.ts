@@ -16,11 +16,11 @@ router.get('/getAll', EmployeeController.getAll);
 
 router.put('/', Middleware.verifyToken, Middleware.handleImage, EmployeeController.updateEmployee);
 
-router.put('/withoutImage', EmployeeController.updateEmployeeWithoutImage);
+router.put('/withoutImage', Middleware.verifyToken, EmployeeController.updateEmployeeWithoutImage);
 
 router.get('/getById/:_id', EmployeeController.employeeGetById);
 
-router.delete('/:_id', EmployeeController.deleteEmployee);
+router.delete('/:_id', Middleware.verifyToken, EmployeeController.deleteEmployee);
 
 
 export default router;

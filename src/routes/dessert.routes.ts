@@ -12,10 +12,10 @@ router.get('/getAll', DessertController.getAll);
 
 router.put('/', Middleware.verifyToken, Middleware.handleImage, DessertController.updateDessert);
 
-router.put('/withoutImage', DessertController.updateDessertWithoutImage);
+router.put('/withoutImage', Middleware.verifyToken, DessertController.updateDessertWithoutImage);
 
 router.get('/getById/:_id', DessertController.dessertGetById);
 
-router.delete('/:_id', DessertController.deleteDessert);
+router.delete('/:_id', Middleware.verifyToken, DessertController.deleteDessert);
 
 export default router;
