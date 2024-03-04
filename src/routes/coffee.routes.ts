@@ -1,7 +1,6 @@
 import express from "express";
 import * as Middleware from "../middlewares";
 import * as CoffeeController from "../controllers/coffee.controller";
-import * as EmployeeController from "../controllers/employee.controller";
 
 const router = express.Router();
 /*

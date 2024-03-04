@@ -9,6 +9,7 @@ import * as process from "process";
 import EmployeeRouts from "./routes/employee.routes"
 import CoffeeRouts from "./routes/coffee.routes"
 import DessertRouts from "./routes/dessert.routes"
+import OrderRouts from "./routes/order.routes"
 
 
 
@@ -46,6 +47,7 @@ db.on( 'open', () => {
 app.use('/employee', EmployeeRouts);
 app.use('/coffee', CoffeeRouts);
 app.use('/dessert', DessertRouts);
+app.use('/order', OrderRouts);
 
 
 

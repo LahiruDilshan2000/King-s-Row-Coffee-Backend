@@ -4,7 +4,6 @@ import CustomResponse from "../dtos/custom.response";
 import {IEmployee} from "../types/schema.types";
 import * as fs from "fs";
 import path from "path";
-import CoffeeModel from "../models/coffee.model";
 
 export const saveEmployee = async (req: express.Request, res: any) => {
 

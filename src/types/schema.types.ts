@@ -30,9 +30,17 @@ export interface IDessert extends mongoose.Document {
 }
 
 export interface IOrder extends mongoose.Document {
-    name:string;
-    desc:string;
-    size:number;
-    qty:number;
-    image:string;
+    _id:string;
+    date:Date;
+    orderDetails: [IOrderDetail];
 }
+
+export interface IOrderDetail extends mongoose.Document{
+    productId: string;
+    name:string;
+    size:string;
+    qty:number;
+    total:number;
+    image: string;
+}
+
